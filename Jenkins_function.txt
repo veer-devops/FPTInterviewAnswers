@@ -1,0 +1,25 @@
+#NAME : name of the snapshot
+
+sh """
+export AWS_ACCESS_KEY_ID=${aws_access_id}
+export AWS_SECRET_ACCESS_KEY=${aws_secret_key}
+aws ec2 describe-snapshots --filters Name=tag:Name,Values=${NAME} --query "Snapshots[*].{ID:SnapshotId}" --region us-east-2 --output text >$HOME/snapshot_id   #Checking whether snapshot with the name:$NAME is present or not
+"""
+snapshot_id=sh (script: 'cat $HOME/snapshot_id', returnStdout: true).trim()
+
+if (snapshot_id?.trim()) {   #if snapshot is present
+wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [[password: aws_secret_key, var: 'AWS_SECRET']]]) {
+    sh """
+    export AWS_ACCESS_KEY_ID=${aws_access_id}
+    export AWS_SECRET_ACCESS_KEY=${aws_secret_key}
+    echo "snapshot found, restoring it"
+    aws ec2 create-volume --snapshot-id $snapshot_id --region us-east-2 --availability-zone $avail_zone --tag-specifications 'ResourceType=volume,Tags=[{Key=Name,Value=${NAME}]'  #Craeting volume from that snapshot
+} 
+else { #snapshot is not present
+wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [[password: aws_secret_key, var: 'AWS_SECRET']]]) {
+  sh """
+  export AWS_ACCESS_KEY_ID=${aws_access_id}
+  export AWS_SECRET_ACCESS_KEY=${aws_secret_key}
+  echo "snapshot with that name not found"
+}
+
