@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: default
+  labels:
+    apps.kubernetes.io/name: nginx
+    apps.kubernetes.io/env: frontend
+    apps.kubernetes.io/managed-by: kubernetes
+spec:
+  selector:
+    matchLabels:
+      apps.kubernetes.io/name: nginx
+      apps.kubernetes.io/env: frontend
+      apps.kubernetes.io/managed-by: kubernetes
+  template:
+    metadata:
+      name: nginx
+      labels:
+        apps.kubernetes.io/name: nginx
+        apps.kubernetes.io/env: frontend
+        apps.kubernetes.io/managed-by: kubernetes
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        command: 
+        - "/bin/bash"
+        - "/tmp/nginx-conf/nginx.sh" 
+        - "-d"
+        resources:
+          requests:
+            cpu: 0.1
+            memory: 128Mi
+          limits:
+            cpu: 0.3
+            memory: 200Mi
+        volumeMounts:
+        - name: nginx-configmap
+          mountPath: /tmp/nginx-conf
+      volumes:
+      - name: nginx-configmap
+        configMap:
+          name: nginx-configmap    

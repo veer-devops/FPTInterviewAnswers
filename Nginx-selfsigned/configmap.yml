@@ -1,0 +1,183 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-configmap
+  namespace: default
+data:
+  nginx.sh: |
+    #!/bin/bash
+    CONFIG_DIR="/tmp/nginx-conf"
+    for f in index.html; do
+       if [ -e "${CONFIG_DIR}/$f" ]; then
+          cp ${CONFIG_DIR}/$f /usr/share/nginx/html/index.html
+          #cp ${CONFIG_DIR}/index.html /usr/share/nginx/html/index.html
+       else
+          echo "ERROR: Could not find $f in $CONFIG_DIR"
+       fi
+    done
+    mkdir /etc/nginx/snippets
+    touch /etc/nginx/snippets/self-signed.conf
+    touch /etc/nginx/snippets/ssl-params.conf
+
+    cat > /etc/ssl/certs/nginx.pem <<EOM
+    -----BEGIN CERTIFICATE-----
+    MIID2zCCAsOgAwIBAgIUKpHSYYO7decQwhVmjLd/bGZrfpkwDQYJKoZIhvcNAQEL
+    BQAwfTELMAkGA1UEBhMCSU4xDzANBgNVBAgMBlB1bmphYjEPMA0GA1UEBwwGTW9o
+    YWxpMQwwCgYDVQQKDANBQkMxDDAKBgNVBAsMA2FiYzESMBAGA1UEAwwJMTI3LjAu
+    MC4xMRwwGgYJKoZIhvcNAQkBFg1hYmNAZ21haWwuY29tMB4XDTIwMDYxNDEwMzYz
+    N1oXDTIxMDYxNDEwMzYzN1owfTELMAkGA1UEBhMCSU4xDzANBgNVBAgMBlB1bmph
+    YjEPMA0GA1UEBwwGTW9oYWxpMQwwCgYDVQQKDANBQkMxDDAKBgNVBAsMA2FiYzES
+    MBAGA1UEAwwJMTI3LjAuMC4xMRwwGgYJKoZIhvcNAQkBFg1hYmNAZ21haWwuY29t
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzk6QpC/nIi4Vy2IgD+uR
+    2Ybh8h26k13ex6W1YCW5GxOMwkQ8F13x22rOwKgPdhcNlVsK/Jduln+Rj1q5DDZf
+    At1UpPA23X41gI+LhGiduzwD8xfJHHlYs87OP3fI9YS73DENDnIbU+unu0uTL8SK
+    2UXaQXPXcC+/j31RtOQnfZ/CB7BTcMF9dc+YF8QoogUhF8QWl8oorq1M/CQ0W/co
+    6XadfhTuzX93t/cJWiUGgZ4fQ42aievdWtbfT29EPb+dDokwonTwoDyJGlsLjvNW
+    ve9NqqBNGSr+2ZY/UCBWE0hN0mKDyy9zpquIB3idgpc07R4EnCYwmJ+znQUo1Zka
+    awIDAQABo1MwUTAdBgNVHQ4EFgQUMmUMmOUILmZhGX7sCW2skWCzDBkwHwYDVR0j
+    BBgwFoAUMmUMmOUILmZhGX7sCW2skWCzDBkwDwYDVR0TAQH/BAUwAwEB/zANBgkq
+    hkiG9w0BAQsFAAOCAQEAr2KcbojDzSg65J4yNQ/2JE5qeHWYsxgHIa2ya8n/NNjm
+    l3LaPCkcZN7YVKH0YqcqQb7ZO/js/Va2VufXwLRmwktwsP7iBOJUZmJrA6E4WZDk
+    yNK9xR7DRWOYftV1Fi6ACa2v7ZqhvLgL3vu1a1IM9M+uHdl3kKg55ycAxHJq/uP5
+    DPAkE4tkRh8PAUOxv5H2yZwL37okcLCAIMDLWx8dkwBIzbRT4bvOkQvZ6KWXENo7
+    XtY35h9Uw0X4SynbeKnU46TM8xqZVZMyCzee04lkKOVnWpVsW0rAFd2Aq8akW11q
+    b9LOgjnRUqyu8OM5TAOdX1kCtnSKi8+oYLNyWyN4yQ==
+    -----END CERTIFICATE-----
+    EOM
+
+    cat > /etc/ssl/private/nginx.key <<EOM
+    -----BEGIN PRIVATE KEY-----
+    MIIEwAIBADANBgkqhkiG9w0BAQEFAASCBKowggSmAgEAAoIBAQDOTpCkL+ciLhXL
+    YiAP65HZhuHyHbqTXd7HpbVgJbkbE4zCRDwXXfHbas7AqA92Fw2VWwr8l26Wf5GP
+    WrkMNl8C3VSk8DbdfjWAj4uEaJ27PAPzF8kceVizzs4/d8j1hLvcMQ0OchtT66e7
+    S5MvxIrZRdpBc9dwL7+PfVG05Cd9n8IHsFNwwX11z5gXxCiiBSEXxBaXyiiurUz8
+    JDRb9yjpdp1+FO7Nf3e39wlaJQaBnh9DjZqJ691a1t9Pb0Q9v50OiTCidPCgPIka
+    WwuO81a9702qoE0ZKv7Zlj9QIFYTSE3SYoPLL3Omq4gHeJ2ClzTtHgScJjCYn7Od
+    BSjVmRprAgMBAAECggEBALTj8DD2C4xNqjBtNj2fSH/Zo40+AdSqzuZw5kqKaPZT
+    uuyvFZ1Lcv/3c5c7BGt/pRpa/JQjVwTAj+mJG42Yss/5Lvl74i9tNQ4nTqZncD22
+    TqQ8K8s6nsrxvqepqNuVaX6Ux6Tt6gY4LxarGkAc7b26YLdZEgI865KtyBF6pyGe
+    eGKDJZWnNwzIZ8E5NNolLUQdcLXzzqtDVn2YZlHpCHV8AIEFHLpdiQdR2Hqbqnat
+    aBAOG1XmIAheAHmhYuJv1rfDOgqVwemr2A8mSZ0qSAlU/9mzuj6X4tPnoqeSuHnL
+    uJR3gX2j5oIfpPnhyqMSVuk6t0iPHFprP5ZQmou3IRkCgYEA/gn7hETVBYlRactX
+    nWW5A/uGyglcxNvABkYKIebosUJPXnV60Qoccpa0XA6FBpLqtnu6rHhdMJJ1WAJu
+    ZP0qAgbhBHENbNyL/QWvKFFGTcj5Z7uvm2iQpBTzTxkabpTn/ETnYBZ2FFQvMVuh
+    Nqixy9j39vlSDyFxYWGZDpmcVecCgYEAz+ZBzU0lVXtdMFqdDM8PQYrWTuXgoC41
+    6rA1VBL8cxazdbOI48Y4ElpmwBNqRGVdqOrwFP4D9Wk8CR0IOsFRiCj+horDs11X
+    MrZw+s5alIfTQ42LxjjB35QIzOPWPVTBof8aG9+TTamN6KbUnXPnDMyFrImG1g6i
+    4ygSvCfjPt0CgYEA2snIJ7uMZ49DYcUyOSnRtX9cMAbuMdE8yWpq8ZXIVFnSt3yg
+    gQafR4VJ4nrS0L2Zjf5z4HRtdha9H0ZAw5NSKZq5EzU2pcoweoL5vtR4oydyvYdk
+    j4j4AYjVoArzu8ddIORLDXNq0MlMN8s9xjB1qCW+MaO6q7NWzdLbmjpr7YMCgYEA
+    q5fU/+qIwgFMbTidH5FXejVppT0/JXZ+sfI2UepJy4QVIzTH65gTd7J91FMyBrnT
+    kDQ5bFosUkZFcxAvVq9w5/1N9yZZWJXV/tlubtQbFzT0PnF5yGXYPv0kNlhm38Ax
+    AdBYcGEcZ6Fmq3vnSP382ieEvV/VlqAF+Y99xyb0/VECgYEA6iSk5eY6T/6+2pBC
+    luTm6mDHLW3b11+lFmJpopNKUleDf92/ZhzYhY+1JAtUNDtx/lTwpXql9y6Aj5Tc
+    PgomlDedoWXVOt7058pL9ZT0Y26CYwBmQ2MEvsSGRVR44Jh2da6/QAyUhdgahz9Z
+    RiKnY4DojhXHCo5CxHlkKKv6HOc=
+    -----END PRIVATE KEY-----
+    EOM
+
+    cat > /etc/ssl/certs/dhparam.pem <<EOM
+    -----BEGIN DH PARAMETERS-----
+    MIIBCAKCAQEA2COzGVOkj//Zy218nBCQhlw+5dpoiK+92H6MmRaAh/gQb3ixYkkx
+    p6UX11vU/g76F8NJlnu3W6xgKQTcfB9ukNE3sa4sBXyx6fhKUkwzJbMUqkQ3HlWX
+    Nj3t9GZIOnmSSl9MgtDl6JJFGx4RvziipkohllqNr6ADzW5VYWJaPMb7vlvpGqKR
+    R8u8Pw7pk92a08q3SqnZB3pUpqwaHsOFdiJsmI96iwzpbUbS/2J8c/d/1CVu1VHg
+    hsfoux+dZGmn/oxig2elYQafAvokwQRUponWPYGloWgCa3qUhiKjA+iQ4Y+bEaci
+    vlu13GSDk+KUdVAL4oMlH77bIJJKuHzKcwIBAg==
+    -----END DH PARAMETERS-----
+    EOM
+
+    cat > /etc/nginx/snippets/self-signed.conf <<EOM
+    ssl_certificate /etc/ssl/certs/nginx.pem;
+    ssl_certificate_key /etc/ssl/private/nginx.key;
+    EOM
+
+    cat > /etc/nginx/snippets/ssl-params.conf <<EOM
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_prefer_server_ciphers on;
+    ssl_ciphers "EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH";
+    ssl_ecdh_curve secp384r1;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_tickets off;
+    ssl_stapling off;
+    ssl_stapling_verify on;
+    resolver 8.8.8.8 8.8.4.4 valid=300s;
+    resolver_timeout 5s;
+    add_header Strict-Transport-Security "max-age=63072000; includeSubdomains";
+    add_header X-Frame-Options DENY;
+    add_header X-Content-Type-Options nosniff;
+
+    ssl_dhparam /etc/ssl/certs/dhparam.pem;
+    EOM
+
+    cat > /etc/nginx/conf.d/default.conf <<EOM
+    # Default server configuration
+    server {
+           listen       80;
+           listen  [::]:80;
+           server_name  localhost;
+           # ssl configuration
+           listen 443 ssl default_server;
+           listen [::]:443 ssl default_server;
+           #charset koi8-r;
+           #access_log  /var/log/nginx/host.access.log  main;
+           include snippets/self-signed.conf;
+           include snippets/ssl-params.conf;
+           location / {
+               root   /usr/share/nginx/html;
+               index  index.html index.htm;
+           }
+
+           #error_page  404              /404.html;
+
+           # redirect server error pages to the static page /50x.html
+           #
+           error_page   500 502 503 504  /50x.html;
+           location = /50x.html {
+               root   /usr/share/nginx/html;
+           }
+
+           # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+           #
+           #location ~ \.php$ {
+           #    proxy_pass   http://127.0.0.1;
+           #}
+
+           # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+           #
+           #location ~ \.php$ {
+           #    root           html;
+           #    fastcgi_pass   127.0.0.1:9000;
+           #    fastcgi_index  index.php;
+           #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+           #    include        fastcgi_params;
+           #}
+
+           # deny access to .htaccess files, if Apache's document root
+           # concurs with nginx's one
+           #
+           #location ~ /\.ht {
+           #    deny  all;
+           #}
+    }
+
+    EOM
+
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>Hii, Welcome to nginx!</title>
+    <style>
+        body {
+            width: 35em;
+            margin: 0 auto;
+            font-family: Tahoma, Verdana, Arial, sans-serif;
+        }
+    </style>
+    </head>
+    <body>
+    <h1>Hii, This is my custom webpage!</h1>
+    <p><em>Thank you for visting this page .</em></p>
+    </body>
+    </html>

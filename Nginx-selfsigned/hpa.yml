@@ -1,0 +1,19 @@
+kind: HorizontalPodAutoscaler 
+apiVersion: autoscaling/v2beta2
+metadata: 
+  name: nginx
+  namespace: default
+spec: 
+  maxReplicas: 2
+  minReplicas: 1 
+  scaleTargetRef: 
+    apiVersion: app/v1 
+    kind: Deployment 
+    name: nginx
+  metrics: 
+  - type: Resource 
+    resource: 
+      name: cpu 
+      target:
+        type: Utilization
+        averageUtilization: 20

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  namespace: default
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+    protocol: TCP
+    nodePort: 31132
+  selector:
+    apps.kubernetes.io/name: nginx
+    apps.kubernetes.io/env: frontend
+    apps.kubernetes.io/managed-by: kubernetes   
